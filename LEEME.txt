@@ -1,0 +1,15 @@
+PORTAFOLIO WEB EN .NET (Visual Studio 2022)
+
+ABRIR:
+1. Descomprime el ZIP.
+2. Haz doble clic en PortafolioWeb.sln (se abre en Visual Studio).
+3. Pulsa F5 (o Ctrl+F5). Se abre el navegador con tu portafolio.
+
+REQUISITOS:
+- Visual Studio 2022 con la carga de trabajo "ASP.NET y desarrollo web".
+- SDK de .NET 8.
+
+ARCHIVOS:
+- PortafolioWeb/wwwroot/index.html     -> el contenido (tu nombre, textos, proyectos, contacto)
+- PortafolioWeb/wwwroot/css/style.css  -> los colores y el diseño
+- PortafolioWeb/Program.cs             -> hace que el sitio funcione (no hace falta tocarlo)
