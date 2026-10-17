@@ -1,13 +1,16 @@
 trigger:
   - main # Se dispara automáticamente al hacer push a la rama main
- 
+
 pool:
   vmImage: 'windows-2022'
- 
+
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '10.0.x'
- 
+  serviceConnection: 'azure-portafolio-connection'
+  webAppName: 'leyani' # Nombre de tu Web App en Azure
+  webAppType: 'webApp' # Windows (confirmado en Azure)
+
 stages:
 # 1. ETAPA DE COMPILACIÓN (CI)
 - stage: Build
@@ -16,23 +19,26 @@ stages:
   - job: BuildJob
     steps:
     - task: UseDotNet@2
+      displayName: 'Instalar .NET SDK'
       inputs:
         packageType: 'sdk'
         version: '$(dotnetVersion)'
- 
+
     - task: DotNetCoreCLI@2
+      displayName: 'Publicar proyecto web'
       inputs:
         command: 'publish'
         publishWebProjects: true
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
- 
+
     - task: PublishBuildArtifacts@1
+      displayName: 'Publicar artefacto'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
- 
+
 # 2. ETAPA DE DESPLIEGUE (CD)
 - stage: Deploy
   displayName: 'Despliegue a Azure App Service'
@@ -42,16 +48,17 @@ stages:
   - job: DeployJob
     steps:
     - task: DownloadBuildArtifacts@0
+      displayName: 'Descargar artefacto'
       inputs:
         buildType: 'current'
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
- 
+
     - task: AzureWebApp@1
+      displayName: 'Desplegar a Azure Web App'
       inputs:
-        azureSubscription: 'azure-portafolio-connection' # Nombre de la Service Connection
-        appType: 'webApp' # Usa 'webAppLinux' si la Web App es Linux
-        appName: 'PortafolioDevsNixar20261007010712' # Verifica que coincida con el nombre real de tu App Service
+        azureSubscription: '$(serviceConnection)'
+        appType: '$(webAppType)'
+        appName: '$(webAppName)'
         package: '$(System.ArtifactsDirectory)/drop/*.zip'
- 
